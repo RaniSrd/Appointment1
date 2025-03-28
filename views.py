@@ -1,15 +1,15 @@
-from django.shortcuts import render, redirect # type: ignore
-from django.http import HttpResponse # type: ignore
+# from django.shortcuts import render, redirect # type: ignore
+# from django.http import HttpResponse # type: ignore
 
-from models1 import Appointment # type: ignore
-from .models import * # type: ignore
-from django.contrib import messages # type: ignore
-from django.contrib.auth.hashers import make_password, check_password # type: ignore
-from django.db import IntegrityError # type: ignore
-from datetime import date
-from django.urls import get_resolver # type: ignore
-from datetime import datetime
-import calendar
+# from models1 import Appointment # type: ignore
+# from .models import * # type: ignore
+# from django.contrib import messages # type: ignore
+# from django.contrib.auth.hashers import make_password, check_password # type: ignore
+# from django.db import IntegrityError # type: ignore
+# from datetime import date
+# from django.urls import get_resolver # type: ignore
+# from datetime import datetime
+# import calendar
 
 # ============================home=================================
 
@@ -126,43 +126,81 @@ import calendar
 #         return redirect('/index/')  # Redirect to a confirmation page
 
 #     return render(request, 'index.html')  # Render the form
+from django.shortcuts import render, redirect
+from django.views.decorators.csrf import csrf_exempt  # Debugging purpose
+from .models import Appointments
+from django.contrib import messages
 
-
+@csrf_exempt  # REMOVE this after debugging
 def appointment(request):
-    if request.method == 'POST':
-        data = request.POST
-        appointment_date = data.get('appointment_date')
-        appointment_time = data.get('appointment_time')
-        person_name = data.get('person_name')  
-        person_dob = data.get('person_dob')  
-        person_phone = data.get('person_phone')
-        person_email = data.get('person_email')
-        remarks = data.get('remarks')
-        meet_person_name = data.get('meet_person_name')
+    print(f"Request Method: {request.method}")  # Debugging
 
-        # Validate and convert date format
-        try:
-            appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
-        except ValueError:
-            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
-            return redirect('/index/')  # Redirect to the form page with an error
+    if request.method == "POST":
+        print(f"POST Data: {request.POST}")  # Debugging
+        
+        appointment_date = request.POST.get('appointment_date')
+        appointment_time = request.POST.get('appointment_time')
+        person_name = request.POST.get('person_name')
+        person_dob = request.POST.get('person_dob')
+        person_phone = request.POST.get('person_phone')
+        person_email = request.POST.get('person_email')
+        remarks = request.POST.get('remarks')
+        meet_person_name = request.POST.get('meet_person_name')
 
-        # Save data to the database
-        appointment = Appointment.objects.create(
-            appointment_date=appointment_date,
-            appointment_time=appointment_time,
-            person_name=person_name,
-            person_dob=person_dob,
-            person_phone=person_phone,
-            person_email=person_email,
-            remarks=remarks,
-            meet_person_name=meet_person_name,
-        )
-
-        messages.success(request, "Appointment booked successfully!")
-        return redirect('/index/')  # Redirect to a confirmation page
+        if appointment_date and appointment_time and person_name:
+            Appointments.objects.create(
+                appointment_date=appointment_date,
+                appointment_time=appointment_time,
+                person_name=person_name,
+                person_dob=person_dob,
+                person_phone=person_phone,
+                person_email=person_email,
+                remarks=remarks,
+                meet_person_name=meet_person_name
+            )
+            messages.success(request, "Appointment booked successfully!")
+            return redirect('/')
+        else:
+            messages.error(request, "All fields are required.")
 
     return render(request, 'index.html')
+
+
+# def appointment(request):
+#     if request.method == 'POST':
+#         data = request.POST
+#         appointment_date = data.get('appointment_date')
+#         appointment_time = data.get('appointment_time')
+#         person_name = data.get('person_name')  
+#         person_dob = data.get('person_dob')  
+#         person_phone = data.get('person_phone')
+#         person_email = data.get('person_email')
+#         remarks = data.get('remarks')
+#         meet_person_name = data.get('meet_person_name')
+
+#         # Validate and convert date format
+#         try:
+#             appointment_date = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+#         except ValueError:
+#             messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
+#             return redirect('/index/')  # Redirect to the form page with an error
+
+#         # Save data to the database
+#         appointment = Appointment.objects.create(
+#             appointment_date=appointment_date,
+#             appointment_time=appointment_time,
+#             person_name=person_name,
+#             person_dob=person_dob,
+#             person_phone=person_phone,
+#             person_email=person_email,
+#             remarks=remarks,
+#             meet_person_name=meet_person_name,
+#         )
+
+#         messages.success(request, "Appointment booked successfully!")
+#         return redirect('/index/')  # Redirect to a confirmation page
+
+#     return render(request, 'index.html')
 
 
 
