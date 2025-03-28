@@ -15,7 +15,10 @@ SECRET_KEY = 'django-insecure-kf@niofg(vcj9vw_%h@7z(cm3jzqe!v_z87nx!9fx9p$wc43r9
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+CSRF_TRUSTED_ORIGINS = [
+    'https://RaniSrd.github.io',
+    'http://127.0.0.1:8000',  # Local development
+]
 
 # Application definition
 
